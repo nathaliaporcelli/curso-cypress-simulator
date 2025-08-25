@@ -1,0 +1,1 @@
+console.log("Minha aplicação está rodando")
