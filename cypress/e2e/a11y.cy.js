@@ -9,12 +9,16 @@ describe("Cypress simulator - A11y checks", () => {
         cy.injectAxe()
 
     })
-    it("Type a cypress command valid and press run button", () => {
-        cy.run("cy.visit('https://google.com)")
-        cy.get("#outputArea").contains("Success")
-            .and("be.visible")
-        cy.checkA11y(".success")
+    Cypress._.times(100, () => {
+        it("Type a cypress command valid and press run button", () => {
+            cy.run("cy.visit('https://google.com)")
+            cy.get("#outputArea").contains("Success")
+                .and("be.visible")
+            cy.checkA11y(".success")
+        })
+
     })
+
 
 
     it("Type a cypress command invalid e.g cy cypress.visit(https://google.com)and press run button", () => {
