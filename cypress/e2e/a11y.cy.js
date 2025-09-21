@@ -1,7 +1,7 @@
 describe("Cypress simulator - A11y checks", () => {
     beforeEach(() => {
         cy.login()
-        cy.visit("src/index.html?skipCaptcha=true", {
+        cy.visit("src/index.html?skipCaptcha=true&chancesOfError=0", {
             onBeforeLoad(win) {
                 win.localStorage.setItem("cookieConsent", "accepted")
             }
@@ -9,14 +9,14 @@ describe("Cypress simulator - A11y checks", () => {
         cy.injectAxe()
 
     })
-    Cypress._.times(100, () => {
-        it("Type a cypress command valid and press run button", () => {
-            cy.run("cy.visit('https://google.com)")
-            cy.get("#outputArea").contains("Success")
-                .and("be.visible")
-            cy.checkA11y(".success")
-        })
+    //Cypress._.times(100, () => {       
 
+    // })
+    it("Type a cypress command valid and press run button", () => {
+        cy.run("cy.visit('https://google.com)")
+        cy.get("#outputArea").contains("Success")
+            .and("be.visible")
+        cy.checkA11y(".success")
     })
 
 
