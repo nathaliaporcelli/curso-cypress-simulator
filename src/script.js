@@ -284,12 +284,12 @@ document.addEventListener("DOMContentLoaded", () => {
     sandwichMenu.setAttribute("aria-expanded", dropdownMenu.classList.contains("show"))
   })
 
-//  document.addEventListener("click", event => {
-   // if (!sandwichMenu.contains(event.target) && !dropdownMenu.contains(event.target)) {
-   //   dropdownMenu.classList.remove("show")
-    //  sandwichMenu.setAttribute("aria-expanded", "false")
- //   }
- // })
+  document.addEventListener("click", event => {
+    if (!sandwichMenu.contains(event.target) && !dropdownMenu.contains(event.target)) {
+      dropdownMenu.classList.remove("show")
+      sandwichMenu.setAttribute("aria-expanded", "false")
+    }
+  })
 
   logoutButton.addEventListener("click", () => {
     localStorage.removeItem("cypressSimulatorSession")
