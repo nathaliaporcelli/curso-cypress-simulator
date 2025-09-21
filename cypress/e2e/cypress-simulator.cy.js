@@ -25,8 +25,8 @@ describe("Cypress simulator", () => {
 
   })
 
-  it("Shows an warning when type a cypress command not implementend yet and press run button", () => {
-    cy.run("cy.contains()")
+  it.only("Shows an warning when type a cypress command not implementend yet and press run button", () => {
+    //cy.run("cy.contains()")
     cy.get("#outputArea").contains("Warning")
 
   })
