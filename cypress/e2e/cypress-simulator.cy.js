@@ -2,46 +2,41 @@ describe("Cypress simulator", () => {
 
 
   beforeEach(() => {
-    cy.visit("http://127.0.0.1:8080/?skipCaptcha=true", {
-      //onLoad(win) {
-       // win.localStorage.setItem("cookieConsent", "accepted")
-     // }
+    cy.login()
+    cy.visit("src/index.html?skipCaptcha=true", {
+      onBeforeLoad(win) {
+        win.localStorage.setItem("cookieConsent", "accepted")
+      }
     })
-    cy.contains("button", "Login").click()
 
   })
 
-
   it("Type a cypress command valid and press run button", () => {
-    cy.get("form > button").click({ force: true })
-    cy.get("#codeInput").type("cy.visit('https://google.com)and press run button", { force: true })
-    cy.get("#runButton").click({ force: true })
+    cy.run("cy.visit('https://google.com")
     cy.get("#outputArea").contains("Success")
       .and("be.visible")
 
   })
+
   it("Type a cypress command invalid e.g cy cypress.visit(https://google.com)and press run button", () => {
-    cy.get("form > button").click({ force: true })
-    cy.get("#codeInput").type("cypress.visit('https://google.com)", { force: true })
-    cy.get("#runButton").click({ force: true })
+    cy.run("cypress.visit('https://google.com)")
     cy.get("#outputArea").contains("Error")
       .and("contain", "Invalid Cypress command")
 
   })
+
   it("Shows an warning when type a cypress command not implementend yet and press run button", () => {
-    cy.get("form > button").click({ force: true })
-    cy.get("#codeInput").type("cy.contains()", { force: true })
-    cy.get("#runButton").click({ force: true })
+    cy.run("cy.contains()")
     cy.get("#outputArea").contains("Warning")
 
   })
+
   it("Shows an error when type a cypress command without parentheses and press run button", () => {
-    cy.get("form > button").click({ force: true })
-    cy.get("#codeInput").type("cy.visit", { force: true })
-    cy.get("#runButton").click({ force: true })
+    cy.run("cy.visit")
     cy.get("#outputArea").contains("Missing parentheses")
 
   })
+
   it("Check if run button is active or inactive correctly ", () => {
     cy.get("#runButton").should("be.disabled")
     cy.get("#codeInput").type("cy.visit", { force: true })
@@ -50,21 +45,14 @@ describe("Cypress simulator", () => {
   })
 
   it("CheckS if help works correctly ", () => {
-    cy.get("#runButton").should("be.disabled")
-    cy.get("#codeInput").type("help")
-    cy.get("#runButton").should("not.be.disabled")
-    cy.get("#runButton").click()
-
+    cy.run("help")
     cy.get("#outputArea")
       .should("contain", "Common Cypress commands and examples:")
     cy.contains("#outputArea a", "official Cypress API documentation")
 
-
   })
   it("maximizes and minimezs a simulation result ", () => {
-    cy.get("form > button").click({ force: true })
-    cy.get("#codeInput").type("cy.visit('https://google.com)and press run button", { force: true })
-    cy.get("#runButton").click({ force: true })
+    cy.run("cy.visit('https://google.com')")
     cy.get('.expand-collapse').click()
 
     cy.get("#outputArea").contains("Success")
@@ -91,45 +79,84 @@ describe("Cypress simulator", () => {
   })
 
   it("Shows the running state showing the final result", () => {
-    cy.get("form > button").click({ force: true })
-    cy.get("#codeInput").type("cy.visit('https://google.com)and press run button", { force: true })
-    cy.get("#runButton").click({ force: true })
+    cy.run("cy.visit('https://google.com)")
 
     cy.contains("button", "Running...").should("be.visible")
       .and("be.visible")
 
     cy.contains("#outputArea", "Running... Please wait.")
-    .should("be.visible")
+      .should("be.visible")
 
     cy.contains("button", "Running...")
-    .should("not.exist")
+      .should("not.exist")
 
     cy.contains("button", "Run")
-    .should("be.visible")
+      .should("be.visible")
 
-     cy.contains("#outputArea", "Success")
-    .should("be.visible")
+    cy.contains("#outputArea", "Success")
+      .should("be.visible")
 
-     cy.contains("#outputArea", "Running... Please wait.")
-    .should("not.exist")
-
-  })
-
-  it("Accepts cookies",() =>{
-
-    cy.get('#acceptCookies').click()
-    cy.get('#cookieConsent > .content')
-    .should('not.be.visible');
+    cy.contains("#outputArea", "Running... Please wait.")
+      .should("not.exist")
 
   })
 
-   it.only("Rejects cookies",() =>{
-    cy.get('#declineCookies').click()
-    cy.get('#cookieConsent > .content')
-    .should('not.be.visible');
+  it("Verify button run states", () => {
+    cy.run("cy.log()")
+    cy.get('#codeInput').clear()
+    cy.get('#runButton').should("be.disabled")
 
+  })
+  it("Verify the initial state after logout and login", () => {
+    cy.run("cy.log('Hi')")
+    cy.get('#sandwich-menu').click()
+    cy.get('#logoutButton').click()
+    cy.get('form > button').click()
+    cy.get('#codeInput').should("have.value", "")
+    cy.get('#runButton').should("be.disabled")
+
+  })
+  it("Verify the initial state of output area after logout and login", () => {
+    cy.run("cy.log('Hi')")
+    cy.get('#sandwich-menu').click()
+    cy.get('#logoutButton').click()
+    cy.contains("button", "Login").click()
+    cy.get('#outputArea').should("not.contain", "cy.log('Hi')")
+
+
+  })
+  it("Doesn't show the cookie consent", () => {
+    cy.clearAllLocalStorage()
+    cy.reload()
+    cy.contains("button", "Login").should("be.visible")
+    cy.get('#cookieConsent').should("not.be.visible")
 
   })
 
 })
+describe("Cypress simulator - Captcha", () => {
+  beforeEach(() => {
+    cy.visit("./src/index.html", {
 
+    })
+    cy.contains("button", "Login").click()
+
+  })
+  it("Disables the captcha verify button when no answer is provided or its cleared", () => {
+    cy.get('#verifyCaptcha').should("be.disabled")
+    cy.get('#captchaInput').type(1)
+    cy.get('#verifyCaptcha').should("be.enabled")
+    cy.get('#captchaInput').clear()
+    cy.get('#verifyCaptcha').should("be.disabled")
+
+  })
+  it("Shows an error on a wrong captcha answer and goes back to its inicial state", () => {
+    cy.get('#captchaInput').type(19)
+    cy.get('#verifyCaptcha').click()
+    cy.get('#captchaError').contains("Incorrect answer, please try again").should("be.visible")
+    cy.get('#captchaError').should("have.value", "")
+    cy.get('#verifyCaptcha').should("be.disabled")
+
+  })
+
+})

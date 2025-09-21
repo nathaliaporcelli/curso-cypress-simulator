@@ -175,7 +175,11 @@ button .spinner {
 }
 
 .error {
-  color: #f25f4c;
+  color: #B30606;
+}
+
+#outputArea.error {
+  color: #e87a7a;
 }
 
 .warning {
